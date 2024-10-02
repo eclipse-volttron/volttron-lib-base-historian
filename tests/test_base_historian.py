@@ -22,10 +22,7 @@
 # ===----------------------------------------------------------------------===
 # }}}
 
-from datetime import datetime
 from time import sleep
-
-from volttron.utils import format_timestamp
 
 from historian.base import BaseHistorianAgent
 

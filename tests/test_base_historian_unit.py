@@ -30,8 +30,6 @@ from pathlib import Path
 import pytest
 from pytz import UTC
 
-from volttrontesting.server_mock import TestServer
-from volttron.client import Agent
 
 from historian.base import BaseHistorianAgent
 

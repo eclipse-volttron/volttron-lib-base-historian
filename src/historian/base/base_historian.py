@@ -260,7 +260,6 @@ _log = logging.getLogger(__name__)
 time_parser = None
 
 ACTUATOR_TOPIC_PREFIX_PARTS = len(topics.ACTUATOR_VALUE.split('/'))
-ALL_REX = re.compile('.*/all$')
 
 # Register a better datetime parser in sqlite3.
 fix_sqlite3_datetime()
@@ -353,6 +352,7 @@ class BaseHistorianAgent(Agent):
                  time_tolerance=None,
                  time_tolerance_topics=None,
                  cache_only_enabled=False,
+                 devices_topic_suffix="multi",
                  **kwargs):
 
         super(BaseHistorianAgent, self).__init__(**kwargs)
@@ -417,6 +417,9 @@ class BaseHistorianAgent(Agent):
         else:
             raise ValueError(f"cache_only_enabled should be either True or False")
 
+        self._devices_topic_suffix = devices_topic_suffix
+
+        self._all_multi_regex = re.compile(f'.*/{self._devices_topic_suffix}$')
         self._default_config = {
                                 "retry_period":self._retry_period,
                                 "submit_size_limit": self._submit_size_limit,
@@ -438,7 +441,8 @@ class BaseHistorianAgent(Agent):
                                 "all_platforms": self._all_platforms,
                                 "time_tolerance": self._time_tolerance,
                                 "time_tolerance_topics": self._time_tolerance_topics,
-                                "cache_only_enabled": self._cache_only_enabled
+                                "cache_only_enabled": self._cache_only_enabled,
+                                "devices_topic_suffix": self._devices_topic_suffix
                                }
 
         self.vip.config.set_default("config", self._default_config)
@@ -586,7 +590,8 @@ class BaseHistorianAgent(Agent):
         self._message_publish_count = message_publish_count
         self._time_tolerance = time_tolerance
         self._time_tolerance_topics = time_tolerance_topics
-
+        self._devices_topic_suffix = config.get("devices_topic_suffix", "multi")
+        self._all_multi_regex = re.compile(f'.*/{self._devices_topic_suffix}$')
         custom_topics_list = []
         for handler, topic_list in config.get("custom_topics", {}).items():
             if handler == "capture_device_data":
@@ -851,10 +856,10 @@ class BaseHistorianAgent(Agent):
                              message):
         """Capture device data and submit it to be published by a historian.
 
-        Filter out only the */all topics for publishing to the historian.
+        Filter out only the */all or */multi topics for publishing to the historian.
         """
 
-        if not ALL_REX.match(topic):
+        if not self._all_multi_regex.match(topic):
             return
 
         # Anon the topic if necessary.
