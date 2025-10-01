@@ -3,13 +3,18 @@ name: Make full release
 on:
   workflow_dispatch:
     inputs:
-      publish-to-test-pypi:
-        description: 'Publish to test pypi instead of pypi'
+      merge-strategy:
+        description: 'Merge strategy and strategy options. Used only in case of merge conflicts'
         required: false
-        default: false
-        type: boolean
+        default: ''
+        type: string
+      release-version:
+        description: 'Version number to use. If provided bump-rule will be ignored'
+        required: false
+        default: ''
+        type: string
       bump-rule:
-        description: 'Rule for computing next release version'
+        description: 'Bump rule for computing next release version number.'
         required: false
         default: 'prerelease'
         type: choice
@@ -21,16 +26,17 @@ on:
           - preminor
           - premajor
           - prerelease
-      release-version:
-        description: 'Version number to use(instead of computing). Should be of the format x.y.z[rcn]. Do not use hyphens.'
+      run-tests-wait:
+        description: 'Wait time to run test after merge to main'
         required: false
-        default: ''
-        type: string
-      merge-strategy:
-        description: 'Merge strategy and strategy options. Used only in case of merge conflicts'
+        default: 600
+        type: number
+      publish-to-test-pypi:
+        description: 'Set to true if you want to publish to https://test.pypi.org/legacy/ instead of pypi.org'
         required: false
-        default: ''
-        type: string
+        default: false
+        type: boolean
+
 
 defaults:
   run:
