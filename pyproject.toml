@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "volttron-lib-base-historian"
-version = "2.0.0rc1"
+version = "2.0.0rc2"
 description = "A base library with extension points for using with the VOLTTRON platform."
 authors = ["VOLTTRON Team <volttron@pnnl.gov>"]
 license = "Apache License 2.0"
