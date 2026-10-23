@@ -205,6 +205,7 @@ import os
 import re
 import sqlite3
 import threading
+import time
 import weakref
 from abc import abstractmethod
 from collections import defaultdict
@@ -1149,7 +1150,7 @@ class BaseHistorianAgent(Agent):
                 # if setup was successful proceed to publish loop
                 if not self._setup_failed:
                     wait_for_input = True
-                    start_time = datetime.utcnow()
+                    start_time = time.monotonic()
 
                     while True:
                         # use local variable that will be written only one time during this loop
@@ -1224,8 +1225,7 @@ class BaseHistorianAgent(Agent):
                                 next_report_count = current_published_count + self._message_publish_count
 
                         self._successful_published = set()
-                        now = datetime.utcnow()
-                        if (now - start_time).total_seconds() > self._max_time_publishing:
+                        if time.monotonic() - start_time > self._max_time_publishing:
                             wait_for_input = False
                             break
 
@@ -2335,7 +2335,7 @@ def p_abstime(t):
     elif type(t[1]) == type(''):
         t[0] = parse_time(t[1])
     else:
-        t[0] = datetime.utcfromtimestamp(t[1] / 1000)
+        t[0] = datetime.fromtimestamp(t[1] / 1000, timezone.utc)
 
 
 def p_reltime(t):

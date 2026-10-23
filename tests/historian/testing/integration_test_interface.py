@@ -24,7 +24,7 @@
 
 import random
 from abc import abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 
 import gevent
 import pytest
@@ -136,7 +136,7 @@ class HistorianTestInterface:
                         }]
 
         # Create timestamp
-        now = format_timestamp(datetime.utcnow())
+        now = format_timestamp(datetime.now(timezone.utc))
 
         # now = '2015-12-02T00:00:00'
         headers = {
@@ -233,7 +233,7 @@ class HistorianTestInterface:
                         }]
 
         # Create timestamp
-        now = format_timestamp(datetime.utcnow())
+        now = format_timestamp(datetime.now(timezone.utc))
 
         # now = '2015-12-02T00:00:00'
         headers = {
@@ -277,7 +277,7 @@ class HistorianTestInterface:
                         'topic_matchme_2': float_meta}]
 
         # Create timestamp
-        now = format_timestamp(datetime.utcnow())
+        now = format_timestamp(datetime.now(timezone.utc))
 
         # now = '2015-12-02T00:00:00'
         headers = {
@@ -335,7 +335,7 @@ class HistorianTestInterface:
                         'topic_matchme_2': float_meta}]
 
         # Create timestamp
-        now = format_timestamp(datetime.utcnow())
+        now = format_timestamp(datetime.now(timezone.utc))
 
         # now = '2015-12-02T00:00:00'
         headers = {
@@ -397,7 +397,7 @@ class HistorianTestInterface:
                         }]
 
         # Create timestamp
-        now = format_timestamp(datetime.utcnow())
+        now = format_timestamp(datetime.now(timezone.utc))
 
         # now = '2015-12-02T00:00:00'
         headers = {
@@ -462,7 +462,7 @@ class HistorianTestInterface:
                    }
 
         # Create timestamp
-        now = format_timestamp(datetime.utcnow())
+        now = format_timestamp(datetime.now(timezone.utc))
         print("now is ", now)
         headers = {
             headers_mod.DATE: now,
