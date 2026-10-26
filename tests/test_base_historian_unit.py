@@ -28,7 +28,6 @@ from shutil import rmtree
 from pathlib import Path
 
 import pytest
-from pytz import UTC
 
 from volttrontesting.server_mock import TestServer
 from volttron.client import Agent
@@ -86,7 +85,7 @@ def test_base_historian_agent_should_filter_duplicates(base_historian_agent):
         {
             "_id": 3,
             "timestamp": datetime.datetime(
-                2015, 11, 17, 21, 24, 10, 189393, tzinfo=UTC
+                2015, 11, 17, 21, 24, 10, 189393, tzinfo=datetime.timezone.utc
             ),
             "source": "record",
             "topic": "duplicate_topic",

@@ -152,7 +152,7 @@ takes the following form:
     [
         {
             '_id': 1,
-            'timestamp': timestamp1.replace(tzinfo=pytz.UTC),
+            'timestamp': timestamp1.replace(tzinfo=timezone.utc),
             'source': 'scrape',
             'topic': "pnnl/isb1/hvac1/thermostat",
             'value': 73.0,
@@ -160,7 +160,7 @@ takes the following form:
         },
         {
             '_id': 2,
-            'timestamp': timestamp2.replace(tzinfo=pytz.UTC),
+            'timestamp': timestamp2.replace(tzinfo=timezone.utc),
             'source': 'scrape',
             'topic': "pnnl/isb1/hvac1/temperature",
             'value': 74.1,
@@ -205,16 +205,16 @@ import os
 import re
 import sqlite3
 import threading
+import time
 import weakref
 from abc import abstractmethod
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 from queue import Queue, Empty
 from threading import Thread
 
 import gevent
-import pytz
 from dateutil.parser import parse
 from gevent import get_hub
 from volttron.client.messaging import topics, headers as headers_mod
@@ -1150,7 +1150,7 @@ class BaseHistorianAgent(Agent):
                 # if setup was successful proceed to publish loop
                 if not self._setup_failed:
                     wait_for_input = True
-                    start_time = datetime.utcnow()
+                    start_time = time.monotonic()
 
                     while True:
                         # use local variable that will be written only one time during this loop
@@ -1225,8 +1225,7 @@ class BaseHistorianAgent(Agent):
                                 next_report_count = current_published_count + self._message_publish_count
 
                         self._successful_published = set()
-                        now = datetime.utcnow()
-                        if (now - start_time).total_seconds() > self._max_time_publishing:
+                        if time.monotonic() - start_time > self._max_time_publishing:
                             wait_for_input = False
                             break
 
@@ -1303,14 +1302,14 @@ class BaseHistorianAgent(Agent):
 
             [
                 {
-                    'timestamp': timestamp1.replace(tzinfo=pytz.UTC),
+                    'timestamp': timestamp1.replace(tzinfo=timezone.utc),
                     'source': 'scrape',
                     'topic': "pnnl/isb1/hvac1/thermostat",
                     'value': 73.0,
                     'meta': {"units": "F", "tz": "UTC", "type": "float"}
                 },
                 {
-                    'timestamp': timestamp2.replace(tzinfo=pytz.UTC),
+                    'timestamp': timestamp2.replace(tzinfo=timezone.utc),
                     'source': 'scrape',
                     'topic': "pnnl/isb1/hvac1/temperature",
                     'value': 74.1,
@@ -1372,7 +1371,7 @@ class BaseHistorianAgent(Agent):
 #             value = row[3]
 #             headers = {} if row[4] is None else row[4]
 #             meta = self._meta_data[(source, topic)].copy()
-#             results.append({'timestamp': timestamp.replace(tzinfo=pytz.UTC),
+#             results.append({'timestamp': timestamp.replace(tzinfo=timezone.utc),
 #                             'source': source,
 #                             'topic': topic,
 #                             'value': value,
@@ -1678,7 +1677,7 @@ class BackupDatabase:
             self._unique_ids.append(_id)
 
             results.append({'_id': _id,
-                            'timestamp': timestamp.replace(tzinfo=pytz.UTC),
+                            'timestamp': timestamp.replace(tzinfo=timezone.utc),
                             'source': source,
                             'topic': topic,
                             'value': value,
@@ -2078,14 +2077,14 @@ class BaseQueryHistorianAgent(Agent):
             except (ValueError, TypeError):
                 start = time_parser.parse(start)
             if start and start.tzinfo is None:
-                start = start.replace(tzinfo=pytz.UTC)
+                start = start.replace(tzinfo=timezone.utc)
         if end is not None:
             try:
                 end = parse_timestamp_string(end)
             except (ValueError, TypeError):
                 end = time_parser.parse(end)
             if end and end.tzinfo is None:
-                end = end.replace(tzinfo=pytz.UTC)
+                end = end.replace(tzinfo=timezone.utc)
 
         if start:
             _log.debug("start={}".format(start))
@@ -2336,7 +2335,7 @@ def p_abstime(t):
     elif type(t[1]) == type(''):
         t[0] = parse_time(t[1])
     else:
-        t[0] = datetime.utcfromtimestamp(t[1] / 1000)
+        t[0] = datetime.fromtimestamp(t[1] / 1000, timezone.utc)
 
 
 def p_reltime(t):
